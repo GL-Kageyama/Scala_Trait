@@ -1,21 +1,106 @@
 # Various behaviors of Scala’s Trait
 
-## Mixin Composition
-### MixinComposition1.scala
-Mixin using extends  
-![スクリーンショット 2021-11-04 15 25 09](https://user-images.githubusercontent.com/36861752/140267809-9d7e6e82-f897-477c-9167-0e4425d00309.png)
-### MixinComposition2.scala
-Mixin using with  
-![スクリーンショット 2021-11-04 15 25 27](https://user-images.githubusercontent.com/36861752/140267839-e6674bde-0c52-400f-a6c1-484b5970a513.png)
+## 1, Mixin Composition
+### 1-1, Mixin using extends  
+```Scala
+// Define trait
+trait Cat {
+    def bark(): Unit = {
+        println("meow meow")
+    }
+}
 
-## Ordered Trait
-### OrderedTrait.scala
+// Mixin trait using "extends"
+class Savannah extends Cat {
+    override def toString = "wild"
+    override def bark(): Unit = {
+        println("Roar! Roar!!!")
+    }
+}
+```
+### 1-2, Mixin using with  
+```Scala
+class Hunting {
+    def hunt(): Unit = {
+        println("Find food")
+    }
+}
+
+// Define trait
+trait Cat {
+    def bark(): Unit = {
+        println("Meow of a cat : meow meow")
+    }
+}
+trait Zebra {
+    def escape(): Unit = {
+        println("Zebras run")
+    }
+}
+
+// Mixin trait using "with"
+class Savannah extends Hunting with Cat with Zebra{
+    override def toString = "wild"
+    override def hunt(): Unit = {
+        println("Lion aims at zebras")
+    }
+    override def bark(): Unit = {
+        println("Lion barks : Roar! Roar!!!")
+    }
+    override def escape(): Unit = {
+        println("Zebras run at full power")
+    }
+}
+```
+
+## 2, Ordered Trait
 Use the methods of the class to automatically increase the methods.  
 By doing so, the interface can be enriched.  
-![スクリーンショット 2021-11-04 15 25 45](https://user-images.githubusercontent.com/36861752/140267884-db244abc-c26b-4de1-b2fd-77ef1fe7ce1d.png)
+```Scala
+// Mixin Ordered trait
+class Comparison(val num: Int) extends Ordered[Comparison] {
+    def compare(that: Comparison) = {
+        val res = this.num - that.num
 
-## Stackable Modifications
-### StackableModifications.scala
+        if (res == 0) {
+            0
+        }else if (res < 0) {
+            -1
+        }else {
+            1
+        }
+    }
+}
+```
+
+## 3, Stackable Modifications
 When changing a method of a class, you can Stackable Modifications.  
 By doing so, subclass, superclass, and trait can be linearized.  
-![スクリーンショット 2021-11-04 15 26 07](https://user-images.githubusercontent.com/36861752/140267903-356f2a5e-c871-4407-be21-bd98b1d024e7.png)
+```Scala
+abstract class Calculation {
+    def calc(x: Int): Unit 
+}
+
+class Addition extends Calculation {
+    def calc(x: Int): Unit = {
+        println(x + x)
+    }
+}
+
+// Define traits for Stackable Modifications
+trait Squared extends Calculation {
+    abstract override def calc(x: Int): Unit = {
+        super.calc(x * x)
+    }
+}
+trait Cube extends Calculation {
+    abstract override def calc(x: Int): Unit = {
+        super.calc(x * x * x)
+    }
+}
+
+// Mixin Stackable modifications traits
+class AddSquCalc extends Addition with Squared
+class AddCubeCalc extends Addition with Cube
+
+```
